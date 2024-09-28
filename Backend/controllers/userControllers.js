@@ -1,4 +1,4 @@
-import UserModel from "../models/User";
+import UserModel from "../models/User.js";
 import bcrypt from "bcrypt" 
 
 class UserController{
@@ -10,14 +10,14 @@ class UserController{
 
             if(!name || !email || !password || !password_confirmation){
                 return res.status(400).json({
-                    status: failed,
+                    status: "failed",
                     message: 'All fields are required'
                 });
             }
 
             if(password !== password_confirmation){
                 return res.status(400).json({
-                    status: failed,
+                    status: "failed",
                     message: "Password and Confirm password don't match"
                 });
             }
@@ -25,7 +25,7 @@ class UserController{
             const existingUser = await UserModel.findOne({email})
                 if(existingUser){
                     return res.status(409).json({
-                        status: failed,
+                        status: "failed",
                         message: "Email already exist"
                 });
             }
@@ -49,7 +49,7 @@ class UserController{
         } catch (error) {
             console.log(error);
             res.status(500).json({
-                status: failed,
+                status: "failed",
                 message: 'Unable to register, please try again later'
             })
         }

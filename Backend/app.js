@@ -5,6 +5,7 @@ import cors from 'cors';
 import cookieParser from 'cookie-parser'
 import connectDb from './config/connectDb.js';
 import passport from 'passport';
+import userRoutes from './routes/userRoute.js'
 
 const app = express();
 
@@ -26,6 +27,8 @@ app.use(express.json());
 app.use(passport.initialize())
 
 app.use(cookieParser())
+
+app.use('/api/user', userRoutes)
 
 app.listen(PORT, ()=>{
     console.log(`Serevr listening at http://localhost:${PORT}`);

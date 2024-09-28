@@ -3,10 +3,13 @@ dotenv.config();
 import express from 'express';
 import cors from 'cors';
 import cookieParser from 'cookie-parser'
+import connectDb from './config/connectDb.js';
 
 const app = express();
 
 const PORT = process.env.PORT;
+
+const MONGODB_URI = process.env.MONGODB_URI
 
 const corsOption = {
     origin: process.env.FRONTED_HOST ,
@@ -14,6 +17,8 @@ const corsOption = {
     optionsSuccessStatus: 200
 };
 app.use(cors(corsOption));
+
+connectDb(MONGODB_URI)
 
 app.use(express.json());
 

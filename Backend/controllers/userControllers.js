@@ -1,5 +1,6 @@
 import UserModel from "../models/User.js";
 import bcrypt from "bcrypt" 
+import sendEmailVarificationOTP from "../utils/sendEmailVarificationOTP.js";
 
 class UserController{
 
@@ -39,6 +40,8 @@ class UserController{
                 email,
                 password: hashPassword
             }).save()
+
+            sendEmailVarificationOTP(req, newUser)
 
             res.status(201).json({
                 status: "success",

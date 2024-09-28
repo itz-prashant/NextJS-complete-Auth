@@ -1,10 +1,13 @@
-import transporter from "../config/emailConfig";
+import transporter from "../config/emailConfig.js";
+import EmailVerificationModel from "../models/EmailVerification.js";
 
 
 const sendEmailVarificationOTP = async (req, user) => {
     // Generate random 4-digit number
     const otp = Math.floor(1000 + Math.random()*9000);
 
+    await new EmailVerificationModel({userId: user._id, otp: otp}).save();
+    
     // OTP varification Link
     const otpVerificationLink = `${process.env.FRONTED_HOST}/account/verifi-email`;
 

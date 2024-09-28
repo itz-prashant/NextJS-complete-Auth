@@ -4,6 +4,7 @@ import express from 'express';
 import cors from 'cors';
 import cookieParser from 'cookie-parser'
 import connectDb from './config/connectDb.js';
+import passport from 'passport';
 
 const app = express();
 
@@ -21,6 +22,8 @@ app.use(cors(corsOption));
 connectDb(MONGODB_URI)
 
 app.use(express.json());
+
+app.use(passport.initialize())
 
 app.use(cookieParser())
 

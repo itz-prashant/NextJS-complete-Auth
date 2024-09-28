@@ -1,6 +1,7 @@
 import UserModel from "../models/User.js";
 import bcrypt from "bcrypt" 
 import sendEmailVarificationOTP from "../utils/sendEmailVarificationOTP.js";
+import EmailVerificationModel from "../models/EmailVerification.js";
 
 class UserController{
 
@@ -57,6 +58,82 @@ class UserController{
             })
         }
     }
+
+    // User Email Verification
+
+    static verifyEmail = async (req,res)=>{
+        try {
+            const {email, otp} = req.body;
+            if( !email || !otp){
+                return res.status(400).json({
+                    status: "failed",
+                    message: 'All fields are required'
+                });
+            }
+
+            const existingUser = await UserModel.findOne({email})
+                if(!existingUser){
+                    return res.status(409).json({
+                        status: "failed",
+                        message: "Email does not exist"
+                });
+            }
+
+            if(existingUser.isVarified){
+                return res.status(400).json({
+                    status: "failed",
+                    message: "Email is already verified"
+                });
+            }
+
+            const emailVerification = await EmailVerificationModel.findOne({
+                userId: existingUser._id, otp
+            })
+
+            if(!emailVerification){
+                if(!existingUser.isVarified){
+                    await sendEmailVarificationOTP(req, existingUser)
+                    return res.status(400).json({
+                        status: "failed",
+                        message: "Invalid OTP , new OTP sent to your email"
+                    });
+
+                }
+                return res.status(400).json({
+                    status: "failed",
+                    message: "Invalid OTP"
+                });
+            }
+
+            const currentTime = new Date()
+            const expireTime = new Date(emailVerification.createdAt.getTime() + 15 * 60 * 1000)
+
+            if(currentTime > expireTime){
+                await sendEmailVarificationOTP(req, existingUser)
+                return res.status(400).json({
+                    status: "failed",
+                    message: "OTP expire , new OTP sent to your email"
+                });
+            }
+
+            existingUser.isVarified = true;
+            await existingUser.save()
+
+            await EmailVerificationModel.deleteMany({userId: existingUser._id})
+
+            res.status(202).json({
+                status: "success",
+                message: "Email Verified successfully",
+            });
+
+        } catch (error) {
+            console.log(error);
+            res.status(500).json({
+                status: "failed",
+                message: 'Unable to verify email'
+            })
+        }
+    } 
 }
 
 export default UserController;

@@ -3,7 +3,7 @@ import mongoose from "mongoose";
 const emailVerificationSchema = new mongoose.Schema({
     userId:{
         type: mongoose.Schema.Types.ObjectId,
-        ref: 'User',
+        ref: 'user',
         required: true
     },
     otp:{
